@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  frontend:
+    image: brdcr-tracker-frontend:0.2
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=https://brdcr-tracker-api.oneui-dev.bml.com.mv/api
+      - GO_APPS_API_URL=https://brdcr-tracker-api.oneui-dev.bml.com.mv/api
+    restart: unless-stopped
+
+  backend:
+    image: brdcr-tracker-api:0.2
+    ports:
+      - "8080:8080"
+    environment:
+      - DATABASE_URL=postgresql://user:password@host:5432/dbname
+    restart: unless-stopped
