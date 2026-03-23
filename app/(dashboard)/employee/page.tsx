@@ -9,6 +9,8 @@ import {
   XCircle,
   Filter,
   Search,
+  TriangleAlert,
+  FilePen,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -20,8 +22,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Card, CardHeader, CardTitle } from "@/components/ui/card"
 import { StatusCard } from "@/components/custom/status-card"
 import { ApplicationsDataTable } from "@/components/custom/applications-data-table"
+import { AlertCircle } from "lucide-react"
 import { Application, ApplicationStatus } from "@/lib/types/application"
 import { DebugMenu } from "@/components/_debug/debug-menu"
 
@@ -29,6 +33,8 @@ type FilterStatus = ApplicationStatus | "all"
 
 export default function EmployeePage() {
   const [applications] = useState<Application[]>([])
+  const [deadlinePassed, setDeadlinePassed] = useState(false)
+  const [formSubmitted, setFormSubmitted] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<FilterStatus>("all")
   const [statusFilters, setStatusFilters] = useState<Record<string, boolean>>({
@@ -105,6 +111,25 @@ export default function EmployeePage() {
             </div>
           </header>
 
+          <Card className="mt-6 bg-background">
+            <CardHeader className="py-3">
+              <CardTitle className="text-base text-foreground">
+                Financial Year 2026 Deadline
+              </CardTitle>
+              <div className="flex items-center gap-2">
+                {deadlinePassed && !formSubmitted && (
+                  <TriangleAlert className="size-4 shrink-0 text-red-500" />
+                )}
+                <p className={deadlinePassed && !formSubmitted ? "text-sm text-red-500" : "text-sm text-muted-foreground"}>
+                  The deadline for the current financial year is{" "}
+                  <span className={deadlinePassed && !formSubmitted ? "font-semibold" : "font-semibold text-foreground"}>
+                    March 31, 2026
+                  </span>.
+                </p>
+              </div>
+            </CardHeader>
+          </Card>
+
           {/* Status Cards */}
           <div className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
             <StatusCard
@@ -153,6 +178,28 @@ export default function EmployeePage() {
               onClick={() => handleStatusCardClick("rejected")}
             />
           </div>
+
+          {/* Declaration CTA */}
+          {!formSubmitted && (
+            <Card className="mt-6 bg-background">
+              <CardHeader className="py-3">
+                <div className="flex items-center justify-between gap-4">
+                  <div>
+                    <CardTitle className="text-base text-foreground">
+                      Start your 2026 Declaration
+                    </CardTitle>
+                    <p className="mt-0.5 text-sm text-muted-foreground">
+                      You haven&apos;t submitted a COI declaration for the current financial year. Click the button to start your declaration now.
+                    </p>
+                  </div>
+                  <Button className="shrink-0 gap-2">
+                    <FilePen className="size-4" />
+                    Start Declaration
+                  </Button>
+                </div>
+              </CardHeader>
+            </Card>
+          )}
 
           {/* Data Table */}
           <div className="mt-6">
@@ -219,7 +266,12 @@ export default function EmployeePage() {
           </div>
         </div>
       </div>
-      <DebugMenu />
+      <DebugMenu
+        deadlinePassed={deadlinePassed}
+        onDeadlinePassedChange={setDeadlinePassed}
+        formSubmitted={formSubmitted}
+        onFormSubmittedChange={setFormSubmitted}
+      />
     </>
   )
 }

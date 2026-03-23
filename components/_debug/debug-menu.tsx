@@ -9,8 +9,22 @@ import {
   SheetTitle,
   SheetDescription,
 } from "@/components/ui/sheet";
+import { Switch } from "@/components/ui/switch";
+import { Label } from "@/components/ui/label";
 
-export function DebugMenu() {
+interface DebugMenuProps {
+  deadlinePassed: boolean;
+  onDeadlinePassedChange: (value: boolean) => void;
+  formSubmitted: boolean;
+  onFormSubmittedChange: (value: boolean) => void;
+}
+
+export function DebugMenu({
+  deadlinePassed,
+  onDeadlinePassedChange,
+  formSubmitted,
+  onFormSubmittedChange,
+}: DebugMenuProps) {
   const [open, setOpen] = useState(false);
 
   return (
@@ -36,8 +50,26 @@ export function DebugMenu() {
             </SheetDescription>
           </SheetHeader>
           <div className="mt-6 space-y-4 px-1">
-            {/* Add debug tools here */}
-            <p className="text-sm text-muted-foreground px-4">No debug tools configured.</p>
+            <div className="flex items-center justify-between rounded-md border px-4 py-3">
+              <Label htmlFor="debug-deadline-passed" className="text-sm">
+                Deadline Passed
+              </Label>
+              <Switch
+                id="debug-deadline-passed"
+                checked={deadlinePassed}
+                onCheckedChange={onDeadlinePassedChange}
+              />
+            </div>
+            <div className="flex items-center justify-between rounded-md border px-4 py-3">
+              <Label htmlFor="debug-form-submitted" className="text-sm">
+                Form Submitted
+              </Label>
+              <Switch
+                id="debug-form-submitted"
+                checked={formSubmitted}
+                onCheckedChange={onFormSubmittedChange}
+              />
+            </div>
           </div>
         </SheetContent>
       </Sheet>
