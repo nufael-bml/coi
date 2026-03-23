@@ -11,6 +11,8 @@ import {
   Search,
   TriangleAlert,
   FilePen,
+  Eye,
+  Pencil,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -28,6 +30,7 @@ import { ApplicationsDataTable } from "@/components/custom/applications-data-tab
 import { AlertCircle } from "lucide-react"
 import { Application, ApplicationStatus } from "@/lib/types/application"
 import { DebugMenu } from "@/components/_debug/debug-menu"
+import { CoiDeclarationSheet } from "@/components/coi-declaration-sheet"
 
 type FilterStatus = ApplicationStatus | "all"
 
@@ -35,6 +38,8 @@ export default function EmployeePage() {
   const [applications] = useState<Application[]>([])
   const [deadlinePassed, setDeadlinePassed] = useState(false)
   const [formSubmitted, setFormSubmitted] = useState(false)
+  const [hasDraft, setHasDraft] = useState(false)
+  const [hasAmendment, setHasAmendment] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<FilterStatus>("all")
   const [statusFilters, setStatusFilters] = useState<Record<string, boolean>>({
@@ -43,6 +48,48 @@ export default function EmployeePage() {
     approved: true,
     rejected: true,
   })
+
+  const handleFormSubmittedChange = (value: boolean) => {
+    setFormSubmitted(value)
+    if (value) {
+      setHasDraft(false)
+      setHasAmendment(false)
+    }
+  }
+
+  const handleHasDraftChange = (value: boolean) => {
+    setHasDraft(value)
+    if (value) {
+      setFormSubmitted(false)
+      setHasAmendment(false)
+    }
+  }
+
+  const handleHasAmendmentChange = (value: boolean) => {
+    setHasAmendment(value)
+    if (value) {
+      setFormSubmitted(false)
+      setHasDraft(false)
+    }
+  }
+
+  const handleSubmitDeclaration = () => {
+    setFormSubmitted(true)
+    setHasDraft(false)
+    setHasAmendment(false)
+  }
+
+  const handleSaveDraftDeclaration = () => {
+    setHasDraft(true)
+    setFormSubmitted(false)
+    setHasAmendment(false)
+  }
+
+  const handleRequestAmendment = () => {
+    setHasAmendment(true)
+    setFormSubmitted(false)
+    setHasDraft(false)
+  }
 
   // Calculate stats
   const stats = useMemo(() => {
@@ -121,9 +168,11 @@ export default function EmployeePage() {
                   <TriangleAlert className="size-4 shrink-0 text-red-500" />
                 )}
                 <p className={deadlinePassed && !formSubmitted ? "text-sm text-red-500" : "text-sm text-muted-foreground"}>
-                  The deadline for the current financial year is{" "}
+                  {deadlinePassed
+                    ? "The deadline has passed on "
+                    : "The deadline for the current financial year is "}
                   <span className={deadlinePassed && !formSubmitted ? "font-semibold" : "font-semibold text-foreground"}>
-                    March 31, 2026
+                    {deadlinePassed ? "15 Jan 2026" : "Jan 15, 2026"}
                   </span>.
                 </p>
               </div>
@@ -180,26 +229,68 @@ export default function EmployeePage() {
           </div>
 
           {/* Declaration CTA */}
-          {!formSubmitted && (
-            <Card className="mt-6 bg-background">
-              <CardHeader className="py-3">
-                <div className="flex items-center justify-between gap-4">
-                  <div>
-                    <CardTitle className="text-base text-foreground">
-                      Start your 2026 Declaration
-                    </CardTitle>
-                    <p className="mt-0.5 text-sm text-muted-foreground">
-                      You haven&apos;t submitted a COI declaration for the current financial year. Click the button to start your declaration now.
-                    </p>
-                  </div>
-                  <Button className="shrink-0 gap-2">
-                    <FilePen className="size-4" />
-                    Start Declaration
-                  </Button>
+          <Card className="mt-6 bg-background">
+            <CardHeader className="py-3">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <CardTitle className="text-base text-foreground">
+                    {hasAmendment
+                      ? "Amendment Request Pending"
+                      : formSubmitted
+                      ? "Declaration Submitted"
+                      : hasDraft
+                        ? "Continue Your Draft"
+                        : "Start your 2026 Declaration"}
+                  </CardTitle>
+                  <p className="mt-0.5 text-sm text-muted-foreground">
+                    {hasAmendment
+                      ? "Your amendment request for the 2026 declaration is pending admin approval. You will be able to edit your declaration once approved."
+                      : formSubmitted
+                      ? "Your COI declaration for 2026 was submitted on 23 Mar 2026, 10:38 PM"
+                      : hasDraft
+                        ? "You have a draft declaration for 2026. Continue where you left off and submit before the deadline."
+                        : "You haven't submitted a COI declaration for the current financial year. Click the button to start your declaration now."}
+                  </p>
                 </div>
-              </CardHeader>
-            </Card>
-          )}
+
+                {hasAmendment ? (
+                  <div className="flex shrink-0 gap-2">
+                    <Button className="gap-2">
+                      <Eye className="size-4" />
+                      View Declaration
+                    </Button>
+                  </div>
+                ) : formSubmitted ? (
+                  <div className="flex shrink-0 gap-2">
+                    <Button className="gap-2">
+                      <Eye className="size-4" />
+                      View Declaration
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="gap-2"
+                      onClick={handleRequestAmendment}
+                    >
+                      <Pencil className="size-4" />
+                      Request Ammendment
+                    </Button>
+                  </div>
+                ) : (
+                  <CoiDeclarationSheet
+                    deadlinePassed={deadlinePassed}
+                    onSubmit={handleSubmitDeclaration}
+                    onSaveDraft={handleSaveDraftDeclaration}
+                    trigger={
+                      <Button className="shrink-0 gap-2">
+                        <FilePen className="size-4" />
+                        {hasDraft ? "Continue Draft" : "Start Declaration"}
+                      </Button>
+                    }
+                  />
+                )}
+              </div>
+            </CardHeader>
+          </Card>
 
           {/* Data Table */}
           <div className="mt-6">
@@ -270,7 +361,11 @@ export default function EmployeePage() {
         deadlinePassed={deadlinePassed}
         onDeadlinePassedChange={setDeadlinePassed}
         formSubmitted={formSubmitted}
-        onFormSubmittedChange={setFormSubmitted}
+        onFormSubmittedChange={handleFormSubmittedChange}
+        hasDraft={hasDraft}
+        onHasDraftChange={handleHasDraftChange}
+        hasAmendment={hasAmendment}
+        onHasAmendmentChange={handleHasAmendmentChange}
       />
     </>
   )

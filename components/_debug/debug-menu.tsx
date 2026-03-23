@@ -17,6 +17,10 @@ interface DebugMenuProps {
   onDeadlinePassedChange: (value: boolean) => void;
   formSubmitted: boolean;
   onFormSubmittedChange: (value: boolean) => void;
+  hasDraft: boolean;
+  onHasDraftChange: (value: boolean) => void;
+  hasAmendment: boolean;
+  onHasAmendmentChange: (value: boolean) => void;
 }
 
 export function DebugMenu({
@@ -24,6 +28,10 @@ export function DebugMenu({
   onDeadlinePassedChange,
   formSubmitted,
   onFormSubmittedChange,
+  hasDraft,
+  onHasDraftChange,
+  hasAmendment,
+  onHasAmendmentChange,
 }: DebugMenuProps) {
   const [open, setOpen] = useState(false);
 
@@ -68,6 +76,26 @@ export function DebugMenu({
                 id="debug-form-submitted"
                 checked={formSubmitted}
                 onCheckedChange={onFormSubmittedChange}
+              />
+            </div>
+            <div className="flex items-center justify-between rounded-md border px-4 py-3">
+              <Label htmlFor="debug-has-draft" className="text-sm">
+                Has Draft
+              </Label>
+              <Switch
+                id="debug-has-draft"
+                checked={hasDraft}
+                onCheckedChange={onHasDraftChange}
+              />
+            </div>
+            <div className="flex items-center justify-between rounded-md border px-4 py-3">
+              <Label htmlFor="debug-has-amendment" className="text-sm">
+                Has Amendment
+              </Label>
+              <Switch
+                id="debug-has-amendment"
+                checked={hasAmendment}
+                onCheckedChange={onHasAmendmentChange}
               />
             </div>
           </div>
