@@ -31,6 +31,7 @@ import { AlertCircle } from "lucide-react"
 import { Application, ApplicationStatus } from "@/lib/types/application"
 import { DebugMenu } from "@/components/_debug/debug-menu"
 import { CoiDeclarationSheet } from "@/components/coi-declaration-sheet"
+import { CoiDeclarationViewSheet } from "@/components/coi-declaration-view-sheet"
 
 type FilterStatus = ApplicationStatus | "all"
 
@@ -38,6 +39,7 @@ export default function EmployeePage() {
   const [applications] = useState<Application[]>([])
   const [deadlinePassed, setDeadlinePassed] = useState(false)
   const [formSubmitted, setFormSubmitted] = useState(false)
+  const [viewOpen, setViewOpen] = useState(false)
   const [hasDraft, setHasDraft] = useState(false)
   const [hasAmendment, setHasAmendment] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
@@ -255,14 +257,14 @@ export default function EmployeePage() {
 
                 {hasAmendment ? (
                   <div className="flex shrink-0 gap-2">
-                    <Button className="gap-2">
+                    <Button className="gap-2" onClick={() => setViewOpen(true)}>
                       <Eye className="size-4" />
                       View Declaration
                     </Button>
                   </div>
                 ) : formSubmitted ? (
                   <div className="flex shrink-0 gap-2">
-                    <Button className="gap-2">
+                    <Button className="gap-2" onClick={() => setViewOpen(true)}>
                       <Eye className="size-4" />
                       View Declaration
                     </Button>
@@ -367,6 +369,7 @@ export default function EmployeePage() {
         hasAmendment={hasAmendment}
         onHasAmendmentChange={handleHasAmendmentChange}
       />
+      <CoiDeclarationViewSheet open={viewOpen} onOpenChange={setViewOpen} />
     </>
   )
 }

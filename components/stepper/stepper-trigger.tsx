@@ -15,10 +15,10 @@ const StepperTrigger = React.forwardRef<HTMLButtonElement, StepperTriggerProps>(
 
     const isDisabled = disabled || !isClickable
 
-    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const handleClick = (e: React.MouseEvent<Element>) => {
       if (isDisabled) return
       setCurrentStep(step)
-      onClick?.(e)
+      onClick?.(e as React.MouseEvent<HTMLButtonElement>)
     }
 
     if (asChild && React.isValidElement(children)) {
