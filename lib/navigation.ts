@@ -62,7 +62,7 @@ export const navigationItems: NavGroup[] = [
           // { title: "All BRDs", url: "/BRDCR/all", icon: FileText },
           {
             title: 'Page1',
-            url: '/404',
+            url: '/employee',
             icon: RectangleHorizontal,
           },
           {

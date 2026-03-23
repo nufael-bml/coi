@@ -17,7 +17,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "BRDCR",
+  title: "COI",
   description: "Welcome to BRDCR!",
 };
 
