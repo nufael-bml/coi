@@ -59,7 +59,7 @@ export function CoiDeclarationSheet({
 
       <SheetContent
         side="right"
-        className="w-full min-w-xl sm:max-w-lg flex flex-col p-0"
+        className="w-full min-w-2xl sm:max-w-lg flex flex-col p-0"
       >
         {/* ── Zone 1: sticky header ── */}
         <SheetHeader className="shrink-0 px-6 pt-6 pb-0">

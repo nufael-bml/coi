@@ -21,6 +21,8 @@ interface DebugMenuProps {
   onHasDraftChange: (value: boolean) => void;
   hasAmendment: boolean;
   onHasAmendmentChange: (value: boolean) => void;
+  useDestructiveDeadlineCard: boolean;
+  onUseDestructiveDeadlineCardChange: (value: boolean) => void;
 }
 
 export function DebugMenu({
@@ -32,6 +34,8 @@ export function DebugMenu({
   onHasDraftChange,
   hasAmendment,
   onHasAmendmentChange,
+  useDestructiveDeadlineCard,
+  onUseDestructiveDeadlineCardChange,
 }: DebugMenuProps) {
   const [open, setOpen] = useState(false);
 
@@ -96,6 +100,16 @@ export function DebugMenu({
                 id="debug-has-amendment"
                 checked={hasAmendment}
                 onCheckedChange={onHasAmendmentChange}
+              />
+            </div>
+            <div className="flex items-center justify-between rounded-md border px-4 py-3">
+              <Label htmlFor="debug-destructive-deadline-card" className="text-sm">
+                Deadline Card — Destructive Style
+              </Label>
+              <Switch
+                id="debug-destructive-deadline-card"
+                checked={useDestructiveDeadlineCard}
+                onCheckedChange={onUseDestructiveDeadlineCardChange}
               />
             </div>
           </div>

@@ -42,6 +42,7 @@ export default function EmployeePage() {
   const [viewOpen, setViewOpen] = useState(false)
   const [hasDraft, setHasDraft] = useState(false)
   const [hasAmendment, setHasAmendment] = useState(false)
+  const [useDestructiveDeadlineCard, setUseDestructiveDeadlineCard] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<FilterStatus>("all")
   const [statusFilters, setStatusFilters] = useState<Record<string, boolean>>({
@@ -152,34 +153,55 @@ export default function EmployeePage() {
           <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="text-2xl font-bold tracking-tight text-foreground">
-                Outside Activity Disclosures
+                Conflict of Interest Disclosures
               </h1>
               <p className="text-sm text-muted-foreground">
-                Submit and track forms for activities you participate in outside the company
+                Submit and track conflict of interest declaration forms
               </p>
             </div>
           </header>
 
-          <Card className="mt-6 bg-background">
-            <CardHeader className="py-3">
-              <CardTitle className="text-base text-foreground">
-                Financial Year 2026 Deadline
-              </CardTitle>
-              <div className="flex items-center gap-2">
-                {deadlinePassed && !formSubmitted && (
-                  <TriangleAlert className="size-4 shrink-0 text-red-500" />
-                )}
-                <p className={deadlinePassed && !formSubmitted ? "text-sm text-red-500" : "text-sm text-muted-foreground"}>
-                  {deadlinePassed
-                    ? "The deadline has passed on "
-                    : "The deadline for the current financial year is "}
-                  <span className={deadlinePassed && !formSubmitted ? "font-semibold" : "font-semibold text-foreground"}>
-                    {deadlinePassed ? "15 Jan 2026" : "Jan 15, 2026"}
-                  </span>.
-                </p>
-              </div>
-            </CardHeader>
-          </Card>
+          {deadlinePassed && !formSubmitted && useDestructiveDeadlineCard ? (
+            <Card className="mt-6 border-destructive/50 bg-destructive/5">
+              <CardHeader className="py-3">
+                <div className="flex items-start gap-3">
+                  <TriangleAlert className="size-5 shrink-0 text-destructive mt-0.5" />
+                  <div>
+                    <CardTitle className="text-base text-destructive">
+                      Financial Year 2026 Deadline Passed
+                    </CardTitle>
+                    <p className="text-sm text-destructive mt-1">
+                      The submission deadline for Financial Year 2026 was{" "}
+                      <span className="font-semibold">15 Jan 2026</span>. You can still
+                      submit your declaration, but you will need to provide a reason for
+                      the late submission.
+                    </p>
+                  </div>
+                </div>
+              </CardHeader>
+            </Card>
+          ) : (
+            <Card className="mt-6 bg-background">
+              <CardHeader className="py-3">
+                <CardTitle className="text-base text-foreground">
+                  Financial Year 2026 Deadline
+                </CardTitle>
+                <div className="flex items-center gap-2">
+                  {deadlinePassed && !formSubmitted && (
+                    <TriangleAlert className="size-4 shrink-0 text-red-500" />
+                  )}
+                  <p className={deadlinePassed && !formSubmitted ? "text-sm text-red-500" : "text-sm text-muted-foreground"}>
+                    {deadlinePassed
+                      ? "The deadline has passed on "
+                      : "The deadline for the current financial year is "}
+                    <span className={deadlinePassed && !formSubmitted ? "font-semibold" : "font-semibold text-foreground"}>
+                      {deadlinePassed ? "15 Jan 2026" : "Jan 15, 2026"}
+                    </span>.
+                  </p>
+                </div>
+              </CardHeader>
+            </Card>
+          )}
 
           {/* Status Cards */}
           <div className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
@@ -368,6 +390,8 @@ export default function EmployeePage() {
         onHasDraftChange={handleHasDraftChange}
         hasAmendment={hasAmendment}
         onHasAmendmentChange={handleHasAmendmentChange}
+        useDestructiveDeadlineCard={useDestructiveDeadlineCard}
+        onUseDestructiveDeadlineCardChange={setUseDestructiveDeadlineCard}
       />
       <CoiDeclarationViewSheet open={viewOpen} onOpenChange={setViewOpen} />
     </>
