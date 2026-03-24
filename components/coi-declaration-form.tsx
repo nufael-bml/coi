@@ -245,7 +245,7 @@ function MaterialInterestEntries({
                 htmlFor={`entry-name-${index}`}
                 className="text-sm font-medium"
               >
-                Related Person Name
+                {entry.relationshipType === "person" ? "Related Person Name" : "Related Company Name"}
               </label>
               <Input
                 id={`entry-name-${index}`}
@@ -253,7 +253,7 @@ function MaterialInterestEntries({
                 onChange={(e) =>
                   updateEntry(index, { relatedPersonName: e.target.value })
                 }
-                placeholder="Enter name"
+                placeholder={entry.relationshipType === "person" ? "Enter name" : "Enter company name"}
                 className="mt-1"
               />
             </div>
@@ -281,13 +281,11 @@ function MaterialInterestEntries({
                         otherRelationship: "",
                       })
                     }
-                    className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+                    className="inline-flex items-center gap-1.5 rounded-md border border-border bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground hover:bg-accent hover:text-foreground hover:border-input transition-colors cursor-pointer"
                     aria-label={`Switch to ${entry.relationshipType === "person" ? "company" : "staff"} relationship`}
                   >
                     <ArrowLeftRight className="size-3" />
-                    {entry.relationshipType === "person"
-                      ? "Company"
-                      : "Staff"}
+                    Switch to {entry.relationshipType === "person" ? "Company" : "Staff"}
                   </button>
                 </div>
                 <Select
