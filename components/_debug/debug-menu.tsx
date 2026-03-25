@@ -21,8 +21,10 @@ interface DebugMenuProps {
   onHasDraftChange: (value: boolean) => void;
   hasAmendment: boolean;
   onHasAmendmentChange: (value: boolean) => void;
-  useDestructiveDeadlineCard: boolean;
-  onUseDestructiveDeadlineCardChange: (value: boolean) => void;
+  useDialogView: boolean;
+  onUseDialogViewChange: (value: boolean) => void;
+  mergeDeadlineCta: boolean;
+  onMergeDeadlineCtaChange: (value: boolean) => void;
 }
 
 export function DebugMenu({
@@ -34,8 +36,10 @@ export function DebugMenu({
   onHasDraftChange,
   hasAmendment,
   onHasAmendmentChange,
-  useDestructiveDeadlineCard,
-  onUseDestructiveDeadlineCardChange,
+  useDialogView,
+  onUseDialogViewChange,
+  mergeDeadlineCta,
+  onMergeDeadlineCtaChange,
 }: DebugMenuProps) {
   const [open, setOpen] = useState(false);
 
@@ -103,13 +107,23 @@ export function DebugMenu({
               />
             </div>
             <div className="flex items-center justify-between rounded-md border px-4 py-3">
-              <Label htmlFor="debug-destructive-deadline-card" className="text-sm">
-                Deadline Card — Destructive Style
+              <Label htmlFor="debug-dialog-view" className="text-sm">
+                View Declaration — Dialog
               </Label>
               <Switch
-                id="debug-destructive-deadline-card"
-                checked={useDestructiveDeadlineCard}
-                onCheckedChange={onUseDestructiveDeadlineCardChange}
+                id="debug-dialog-view"
+                checked={useDialogView}
+                onCheckedChange={onUseDialogViewChange}
+              />
+            </div>
+            <div className="flex items-center justify-between rounded-md border px-4 py-3">
+              <Label htmlFor="debug-merge-deadline-cta" className="text-sm">
+                Merge Deadline + CTA Cards
+              </Label>
+              <Switch
+                id="debug-merge-deadline-cta"
+                checked={mergeDeadlineCta}
+                onCheckedChange={onMergeDeadlineCtaChange}
               />
             </div>
           </div>

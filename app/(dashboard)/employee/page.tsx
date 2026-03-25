@@ -13,6 +13,7 @@ import {
   FilePen,
   Eye,
   Pencil,
+  Zap,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -32,6 +33,8 @@ import { Application, ApplicationStatus } from "@/lib/types/application"
 import { DebugMenu } from "@/components/_debug/debug-menu"
 import { CoiDeclarationSheet } from "@/components/coi-declaration-sheet"
 import { CoiDeclarationViewSheet } from "@/components/coi-declaration-view-sheet"
+import { CoiDeclarationViewDialog } from "@/components/coi-declaration-view-dialog"
+import { InstantCoiSheet } from "@/components/instant-coi-sheet"
 
 type FilterStatus = ApplicationStatus | "all"
 
@@ -42,7 +45,8 @@ export default function EmployeePage() {
   const [viewOpen, setViewOpen] = useState(false)
   const [hasDraft, setHasDraft] = useState(false)
   const [hasAmendment, setHasAmendment] = useState(false)
-  const [useDestructiveDeadlineCard, setUseDestructiveDeadlineCard] = useState(false)
+  const [useDialogView, setUseDialogView] = useState(false)
+  const [mergeDeadlineCta, setMergeDeadlineCta] = useState(false)
   const [searchQuery, setSearchQuery] = useState("")
   const [statusFilter, setStatusFilter] = useState<FilterStatus>("all")
   const [statusFilters, setStatusFilters] = useState<Record<string, boolean>>({
@@ -159,49 +163,150 @@ export default function EmployeePage() {
                 Submit and track conflict of interest declaration forms
               </p>
             </div>
+            {!mergeDeadlineCta && (
+              <InstantCoiSheet
+                trigger={
+                  <Button className="shrink-0 gap-2">
+                    <Zap className="size-4" />
+                    Instant COI
+                  </Button>
+                }
+              />
+            )}
           </header>
 
-          {deadlinePassed && !formSubmitted && useDestructiveDeadlineCard ? (
-            <Card className="mt-6 border-destructive/50 bg-destructive/5">
-              <CardHeader className="py-3">
-                <div className="flex items-start gap-3">
-                  <TriangleAlert className="size-5 shrink-0 text-destructive mt-0.5" />
-                  <div>
-                    <CardTitle className="text-base text-destructive">
-                      Financial Year 2026 Deadline Passed
-                    </CardTitle>
-                    <p className="text-sm text-destructive mt-1">
-                      The submission deadline for Financial Year 2026 was{" "}
-                      <span className="font-semibold">15 Jan 2026</span>. You can still
-                      submit your declaration, but you will need to provide a reason for
-                      the late submission.
+          {/* Deadline card (+ merged CTA when toggle is on) */}
+          {(() => {
+            const deadlineOverdue = deadlinePassed && !formSubmitted && !hasDraft && !hasAmendment
+            return mergeDeadlineCta ? (
+              <Card className={`mt-6 ${
+                deadlineOverdue
+                  ? "border-destructive/50 bg-destructive/5"
+                  : "bg-background"
+              }`}>
+                <CardHeader className="py-3">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div className="flex-1">
+                      {deadlineOverdue ? (
+                        <div className="flex items-start gap-3">
+                          <TriangleAlert className="size-9 shrink-0 self-center text-destructive" />
+                          <div>
+                            <CardTitle className="text-base text-destructive">
+                              Financial Year 2026 Deadline Passed
+                              <span className="font-normal"> — </span>
+                              15 Jan 2026
+                            </CardTitle>
+                            <p className="text-sm text-destructive mt-1">
+                              You can still submit your declaration, but you will need to provide a reason for the late submission.
+                            </p>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-start gap-3">
+                          <div>
+                            <CardTitle className="text-base text-foreground">
+                              Financial Year 2026 Deadline
+                              <span className="font-normal"> — </span>
+                              {deadlinePassed ? "15 Jan 2026" : "Jan 15, 2026"}
+                            </CardTitle>
+                            <p className="text-sm text-muted-foreground mt-1">
+                              {hasAmendment
+                                ? "Your amendment request is pending admin approval. You will be able to edit your declaration once approved."
+                                : formSubmitted
+                                ? "Your COI declaration for 2026 was submitted on 23 Mar 2026, 10:38 PM."
+                                : hasDraft
+                                  ? "You have a draft declaration for 2026. Continue where you left off and submit before the deadline."
+                                  : "You haven't submitted an annual COI declaration for the current financial year."}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                    {/* CTA buttons on the right */}
+                    <div className="shrink-0">
+                      {hasAmendment ? (
+                        <div className="flex gap-2">
+                          <Button className="gap-2" onClick={() => setViewOpen(true)}>
+                            <Eye className="size-4" />
+                            View Declaration
+                          </Button>
+                        </div>
+                      ) : formSubmitted ? (
+                        <div className="flex gap-2">
+                          <Button className="gap-2" onClick={() => setViewOpen(true)}>
+                            <Eye className="size-4" />
+                            View Declaration
+                          </Button>
+                          <Button
+                            variant="outline"
+                            className="gap-2"
+                            onClick={handleRequestAmendment}
+                          >
+                            <Pencil className="size-4" />
+                            Request Amendment
+                          </Button>
+                        </div>
+                      ) : (
+                        <CoiDeclarationSheet
+                          deadlinePassed={deadlinePassed}
+                          onSubmit={handleSubmitDeclaration}
+                          onSaveDraft={handleSaveDraftDeclaration}
+                          trigger={
+                            <Button
+                              className="gap-2"
+                            >
+                              <FilePen className="size-4" />
+                              {hasDraft ? "Continue Draft" : "Start Declaration"}
+                            </Button>
+                          }
+                        />
+                      )}
+                    </div>
+                  </div>
+                </CardHeader>
+              </Card>
+            ) : deadlineOverdue ? (
+              <Card className="mt-6 border-destructive/50 bg-destructive/5">
+                <CardHeader className="py-3">
+                  <div className="flex items-start gap-3">
+                    <TriangleAlert className="size-9 shrink-0 self-center text-destructive" />
+                    <div>
+                      <CardTitle className="text-base text-destructive">
+                        Financial Year 2026 Deadline Passed
+                      </CardTitle>
+                      <p className="text-sm text-destructive mt-1">
+                        The submission deadline for Financial Year 2026 was{" "}
+                        <span className="font-semibold">15 Jan 2026</span>. You can still
+                        submit your declaration, but you will need to provide a reason for
+                        the late submission.
+                      </p>
+                    </div>
+                  </div>
+                </CardHeader>
+              </Card>
+            ) : (
+              <Card className="mt-6 bg-background">
+                <CardHeader className="py-3">
+                  <CardTitle className="text-base text-foreground">
+                    Financial Year 2026 Deadline
+                  </CardTitle>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    {deadlineOverdue && (
+                      <TriangleAlert className="size-4 shrink-0 text-red-500" />
+                    )}
+                    <p className={deadlineOverdue ? "text-sm text-red-500" : "text-sm text-muted-foreground"}>
+                      {deadlinePassed
+                        ? "The deadline has passed on "
+                        : "The deadline for the current financial year is "}
+                      <span className={deadlineOverdue ? "font-semibold" : "font-semibold text-foreground"}>
+                        {deadlinePassed ? "15 Jan 2026" : "Jan 15, 2026"}
+                      </span>.
                     </p>
                   </div>
-                </div>
-              </CardHeader>
-            </Card>
-          ) : (
-            <Card className="mt-6 bg-background">
-              <CardHeader className="py-3">
-                <CardTitle className="text-base text-foreground">
-                  Financial Year 2026 Deadline
-                </CardTitle>
-                <div className="flex items-center gap-2">
-                  {deadlinePassed && !formSubmitted && (
-                    <TriangleAlert className="size-4 shrink-0 text-red-500" />
-                  )}
-                  <p className={deadlinePassed && !formSubmitted ? "text-sm text-red-500" : "text-sm text-muted-foreground"}>
-                    {deadlinePassed
-                      ? "The deadline has passed on "
-                      : "The deadline for the current financial year is "}
-                    <span className={deadlinePassed && !formSubmitted ? "font-semibold" : "font-semibold text-foreground"}>
-                      {deadlinePassed ? "15 Jan 2026" : "Jan 15, 2026"}
-                    </span>.
-                  </p>
-                </div>
-              </CardHeader>
-            </Card>
-          )}
+                </CardHeader>
+              </Card>
+            )
+          })()}
 
           {/* Status Cards */}
           <div className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
@@ -252,69 +357,92 @@ export default function EmployeePage() {
             />
           </div>
 
-          {/* Declaration CTA */}
-          <Card className="mt-6 bg-background">
-            <CardHeader className="py-3">
-              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <CardTitle className="text-base text-foreground">
-                    {hasAmendment
-                      ? "Amendment Request Pending"
-                      : formSubmitted
-                      ? "Declaration Submitted"
-                      : hasDraft
-                        ? "Continue Your Draft"
-                        : "Start your 2026 Declaration"}
-                  </CardTitle>
-                  <p className="mt-0.5 text-sm text-muted-foreground">
-                    {hasAmendment
-                      ? "Your amendment request for the 2026 declaration is pending admin approval. You will be able to edit your declaration once approved."
-                      : formSubmitted
-                      ? "Your COI declaration for 2026 was submitted on 23 Mar 2026, 10:38 PM"
-                      : hasDraft
-                        ? "You have a draft declaration for 2026. Continue where you left off and submit before the deadline."
-                        : "You haven't submitted a COI declaration for the current financial year. Click the button to start your declaration now."}
-                  </p>
-                </div>
-
-                {hasAmendment ? (
-                  <div className="flex shrink-0 gap-2">
-                    <Button className="gap-2" onClick={() => setViewOpen(true)}>
-                      <Eye className="size-4" />
-                      View Declaration
-                    </Button>
+          {/* Instant COI card (merged mode) or Declaration CTA card */}
+          {mergeDeadlineCta ? (
+            <Card className="mt-6 bg-background">
+              <CardHeader className="py-3">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <CardTitle className="text-base text-foreground">Instant COI</CardTitle>
+                    <p className="mt-0.5 text-sm text-muted-foreground"> Use this when an unexpected conflict
+                      occurs and needs to be logged promptly outside of the annual declaration cycle.
+                    </p>
                   </div>
-                ) : formSubmitted ? (
-                  <div className="flex shrink-0 gap-2">
-                    <Button className="gap-2" onClick={() => setViewOpen(true)}>
-                      <Eye className="size-4" />
-                      View Declaration
-                    </Button>
-                    <Button
-                      variant="outline"
-                      className="gap-2"
-                      onClick={handleRequestAmendment}
-                    >
-                      <Pencil className="size-4" />
-                      Request Ammendment
-                    </Button>
-                  </div>
-                ) : (
-                  <CoiDeclarationSheet
-                    deadlinePassed={deadlinePassed}
-                    onSubmit={handleSubmitDeclaration}
-                    onSaveDraft={handleSaveDraftDeclaration}
+                  <InstantCoiSheet
                     trigger={
                       <Button className="shrink-0 gap-2">
-                        <FilePen className="size-4" />
-                        {hasDraft ? "Continue Draft" : "Start Declaration"}
+                        <Zap className="size-4" />
+                        Instant COI
                       </Button>
                     }
                   />
-                )}
-              </div>
-            </CardHeader>
-          </Card>
+                </div>
+              </CardHeader>
+            </Card>
+          ) : (
+            <Card className="mt-6 bg-background">
+              <CardHeader className="py-3">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <CardTitle className="text-base text-foreground">
+                      {hasAmendment
+                        ? "Amendment Request Pending"
+                        : formSubmitted
+                        ? "Declaration Submitted"
+                        : hasDraft
+                          ? "Continue Your Draft"
+                          : "Start your 2026 Declaration"}
+                    </CardTitle>
+                    <p className="mt-0.5 text-sm text-muted-foreground">
+                      {hasAmendment
+                        ? "Your amendment request for the 2026 annual declaration is pending admin approval. You will be able to edit your declaration once approved."
+                        : formSubmitted
+                        ? "Your COI declaration for 2026 was submitted on 23 Mar 2026, 10:38 PM"
+                        : hasDraft
+                          ? "You have a draft declaration for 2026. Continue where you left off and submit before the deadline."
+                          : "You haven't submitted an annual COI declaration for the current financial year. Click the button to start your declaration now."}
+                    </p>
+                  </div>
+
+                  {hasAmendment ? (
+                    <div className="flex shrink-0 gap-2">
+                      <Button className="gap-2" onClick={() => setViewOpen(true)}>
+                        <Eye className="size-4" />
+                        View Declaration
+                      </Button>
+                    </div>
+                  ) : formSubmitted ? (
+                    <div className="flex shrink-0 gap-2">
+                      <Button className="gap-2" onClick={() => setViewOpen(true)}>
+                        <Eye className="size-4" />
+                        View Declaration
+                      </Button>
+                      <Button
+                        variant="outline"
+                        className="gap-2"
+                        onClick={handleRequestAmendment}
+                      >
+                        <Pencil className="size-4" />
+                        Request Amendment
+                      </Button>
+                    </div>
+                  ) : (
+                    <CoiDeclarationSheet
+                      deadlinePassed={deadlinePassed}
+                      onSubmit={handleSubmitDeclaration}
+                      onSaveDraft={handleSaveDraftDeclaration}
+                      trigger={
+                        <Button className="shrink-0 gap-2">
+                          <FilePen className="size-4" />
+                          {hasDraft ? "Continue Draft" : "Start Declaration"}
+                        </Button>
+                      }
+                    />
+                  )}
+                </div>
+              </CardHeader>
+            </Card>
+          )}
 
           {/* Data Table */}
           <div className="mt-6">
@@ -390,10 +518,16 @@ export default function EmployeePage() {
         onHasDraftChange={handleHasDraftChange}
         hasAmendment={hasAmendment}
         onHasAmendmentChange={handleHasAmendmentChange}
-        useDestructiveDeadlineCard={useDestructiveDeadlineCard}
-        onUseDestructiveDeadlineCardChange={setUseDestructiveDeadlineCard}
+        useDialogView={useDialogView}
+        onUseDialogViewChange={setUseDialogView}
+        mergeDeadlineCta={mergeDeadlineCta}
+        onMergeDeadlineCtaChange={setMergeDeadlineCta}
       />
-      <CoiDeclarationViewSheet open={viewOpen} onOpenChange={setViewOpen} />
+      {useDialogView ? (
+        <CoiDeclarationViewDialog open={viewOpen} onOpenChange={setViewOpen} />
+      ) : (
+        <CoiDeclarationViewSheet open={viewOpen} onOpenChange={setViewOpen} />
+      )}
     </>
   )
 }

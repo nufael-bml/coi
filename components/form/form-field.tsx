@@ -173,7 +173,7 @@ export function FormField(props: FormFieldProps) {
   return (
     <div className="space-y-2">
       {!isInlineLabel && (
-        <Label htmlFor={name} className={cn(hasError && "text-destructive")}>
+        <Label htmlFor={name} className={cn("select-text cursor-text", hasError && "text-destructive")}>
           {label}
           {required && <span className="ml-1 text-destructive">*</span>}
         </Label>
@@ -477,7 +477,7 @@ function CheckboxField({
         <Label
           htmlFor={name}
           className={cn(
-            "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+            "select-text cursor-text text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
             hasError && "text-destructive"
           )}
         >
@@ -529,7 +529,7 @@ function RadioField({
             <Label
               htmlFor={`${name}-${option.value}`}
               className={cn(
-                "text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
+                "select-text cursor-text text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70",
                 hasError && "text-destructive"
               )}
             >
@@ -572,7 +572,7 @@ function SwitchField({
         <Label
           htmlFor={name}
           className={cn(
-            "text-sm font-medium leading-none",
+            "select-text cursor-text text-sm font-medium leading-none",
             hasError && "text-destructive"
           )}
         >

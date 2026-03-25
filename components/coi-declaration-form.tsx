@@ -243,7 +243,7 @@ function MaterialInterestEntries({
             <div>
               <label
                 htmlFor={`entry-name-${index}`}
-                className="text-sm font-medium"
+                className="text-sm font-medium select-text cursor-text"
               >
                 {entry.relationshipType === "person" ? "Related Person Name" : "Related Company Name"}
               </label>
@@ -263,7 +263,7 @@ function MaterialInterestEntries({
                 <div className="flex items-center justify-between mb-1">
                   <label
                     htmlFor={`entry-rel-${index}`}
-                    className="text-sm font-medium"
+                    className="text-sm font-medium select-text cursor-text"
                   >
                     {entry.relationshipType === "person"
                       ? "Relationship with Staff"
@@ -316,7 +316,7 @@ function MaterialInterestEntries({
               <div>
                 <label
                   htmlFor={`entry-other-${index}`}
-                  className="text-sm font-medium"
+                  className="text-sm font-medium select-text cursor-text"
                 >
                   Please specify relationship
                 </label>
@@ -383,7 +383,7 @@ function LateSubmissionStep({
       </div>
 
       <div>
-        <label htmlFor="late-reason" className="text-sm font-medium">
+        <label htmlFor="late-reason" className="text-sm font-medium select-text cursor-text">
           Reason for Late Submission
         </label>
         <Textarea
